@@ -105,3 +105,4 @@ venv.bak/
 
 # emacs backups
 *~
+files.txt

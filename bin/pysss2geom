@@ -1,0 +1,10 @@
+#!/usr/bin/env python3
+
+import pysss2
+import sys
+
+print("This is a demonstration script only.")
+
+if len(sys.argv) > 1:
+   for a in sys.argv:
+      print(a)
