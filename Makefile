@@ -17,3 +17,4 @@ testpypi: distfiles
 
 clean : 
 	python setup.py clean --all
+	rm -v dist/*
