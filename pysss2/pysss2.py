@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Created on Mon Oct  7 08:30:08 2019
@@ -1253,33 +1252,3 @@ def _GUI(sss2_args=None):
     print('..main loop commencing..')
     root.mainloop()
 
-if __name__=="__main__":
-    print('..python started..')
-
-    import sys
-
-    helpStr = """'Usage: python pysss2.py [--libsss2so /path/to/libsss2.so]  -interactiveplotter [par1tosss2 par2tosss2 ...]
-The "-interactiveplotter" is mandatory for correct operation.
-"""
-
-    if len(sys.argv) > 1:
-        if sys.argv[1] == '--help':
-            print(helpStr)
-            exit()
-        elif sys.argv[1] == '--libsss2so':
-            _LIBFILE=sys.argv[2]
-            if len(sys.argv) > 3:
-                sss2_args=sys.argv[3:]
-            else:
-                # No parameters for sss2, so let us assume the user wants to give them in the program.
-                sss2_args=None
-        else:
-            sss2_args=sys.argv[1:]
-    else:
-        # No parameters for sss2, so let us assume the user wants to give them in the program.
-        print(helpStr)
-        exit()
-        #sss2_args=None
-
-
-    _GUI( sss2_args=sss2_args)

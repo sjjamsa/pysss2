@@ -13,7 +13,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/sjjamsa/pysss2",
     packages=setuptools.find_packages(),
-    scripts=['bin/pysss2.py'],
+    scripts=['bin/pysss2'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"
