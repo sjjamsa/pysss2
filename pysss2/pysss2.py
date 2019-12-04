@@ -44,9 +44,13 @@ class sss2():
 It's main job is to convert b/w python & numpy types and c types.
 """
     
-    def __init__(self,serpent_arguments=None):
-        print('Loading serpent shared library "'+_LIBFILE+'".')
-        self._soFilename=_LIBFILE
+    def __init__(self,serpent_arguments=None,libfile=None):
+        if libfile is None:
+            self._soFilename=_LIBFILE
+        else:
+            self._soFilename=libfile
+
+        print('Loading serpent shared library "'+self._soFilename+'".')
         self._sss2=ctypes.cdll.LoadLibrary(self._soFilename)
 
         self.sss2_main = self._sss2.main 
@@ -1216,7 +1220,7 @@ def test():
     root.mainloop()
 
 
-def GUI(sss2_args=None):
+def GUI(sss2_args=None,libfile=None):
     print('..TK init..')
     root = tkinter.Tk()
     root.wm_title('SSS2 plotting')
@@ -1236,7 +1240,7 @@ def GUI(sss2_args=None):
         G.varStatus.set('Initializing...Check console for output')
         G.cursor_busy()
         G.root.update()
-        G._sss2 = sss2(serpent_arguments=sss2_args)
+        G._sss2 = sss2(serpent_arguments=sss2_args,libfile=libfile)
         G.retrieveGeometryStats()
         G.retrieveMaterials()
         G.varStatus.set('Serpent initialized...Check console for output')

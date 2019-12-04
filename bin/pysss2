@@ -15,13 +15,14 @@ if __name__=="__main__":
     helpStr = """'Usage: pysss2 [--libsss2so /path/to/libsss2.so]  -interactiveplotter [par1tosss2 par2tosss2 ...]
 The "-interactiveplotter" is mandatory for correct operation.
 """
+    libfile=None
 
     if len(sys.argv) > 1:
         if sys.argv[1] == '--help':
             print(helpStr)
             exit()
         elif sys.argv[1] == '--libsss2so':
-            _LIBFILE=sys.argv[2]
+            libfile=sys.argv[2]
             if len(sys.argv) > 3:
                 sss2_args=sys.argv[3:]
             else:
@@ -36,4 +37,4 @@ The "-interactiveplotter" is mandatory for correct operation.
         #sss2_args=None
 
 
-    pysss2.GUI( sss2_args=sss2_args)
+    pysss2.GUI( sss2_args=sss2_args,libfile=libfile)
