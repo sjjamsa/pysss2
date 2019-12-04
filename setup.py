@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="pysss2",
-    version="0.1.dev3",
+    version="0.1.dev4",
     author="Simppa Äkäslompolo",
     author_email="simppa.akaslompolo@alumni.aalto.fi",
     description="Tools to interact with the Serpent2 Monte Carlo code",
@@ -16,7 +16,7 @@ setuptools.setup(
     scripts=['bin/pysss2'],
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Operating System :: POSIX :: Linux",
         "Development Status :: 3 - Alpha"
     ],
