@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="pysss2",
-    version="0.1.dev0",
+    version="0.1.dev2",
     author="Simppa Äkäslompolo",
     author_email="simppa.akaslompolo@alumni.aalto.fi",
     description="Tools to interact with the Serpent2 Monte Carlo code",

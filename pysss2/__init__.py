@@ -2,6 +2,7 @@
 #
 # 
 #
-version = "0.1.dev0"
 
-from pysss2 import *
+from .pysss2 import *
+
+version = "0.1.dev2"

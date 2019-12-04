@@ -2,13 +2,15 @@
 
 # -*- coding: utf-8 -*-
 
-import pysss2
 
 
 if __name__=="__main__":
     print('..python started..')
 
     import sys
+    import pysss2
+
+    print('..pysss2 version '+pysss2.version+'..')
 
     helpStr = """'Usage: pysss2 [--libsss2so /path/to/libsss2.so]  -interactiveplotter [par1tosss2 par2tosss2 ...]
 The "-interactiveplotter" is mandatory for correct operation.
@@ -34,4 +36,4 @@ The "-interactiveplotter" is mandatory for correct operation.
         #sss2_args=None
 
 
-    pysss2._GUI( sss2_args=sss2_args)
+    pysss2.GUI( sss2_args=sss2_args)

@@ -1216,7 +1216,7 @@ def test():
     root.mainloop()
 
 
-def _GUI(sss2_args=None):
+def GUI(sss2_args=None):
     print('..TK init..')
     root = tkinter.Tk()
     root.wm_title('SSS2 plotting')
