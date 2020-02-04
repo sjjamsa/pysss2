@@ -336,6 +336,7 @@ class geom_gui(tkinter.Frame):
         self.btnGoXZ[        'command']=self.to_XZ_slice
         self.btnGoYZ[        'command']=self.to_YZ_slice
         self.btnQuit[        'command']=self.quit
+        self.btnReload[      'command']=self.reload
         self.varType.trace('w',self.set_Slicer_limits_trace)
 
         self.scaleSlicer.bind('<ButtonRelease-1>',self.updateGeomPlotKey)
@@ -560,6 +561,10 @@ class geom_gui(tkinter.Frame):
 
         self.btnQuit                 = tkinter.Button(self.frameButtonBar, text='Quit', state=tkinter.NORMAL, bg='red')
         self.btnQuit.pack(side       = tkinter.BOTTOM, fill=tkinter.X, expand=False)#, fill=tkinter.BOTH )
+        
+        self.btnReload               = tkinter.Button(self.frameButtonBar, text='Reload', state=tkinter.NORMAL, bg='red')
+        self.btnReload.pack(side     = tkinter.BOTTOM, fill=tkinter.X, expand=False)#, fill=tkinter.BOTH )
+
         
         self.frameButtonBar.pack(side = tkinter.LEFT, expand=False, fill=tkinter.Y)
         self.frameOuterPlot.pack(side = tkinter.TOP, expand=True, fill=tkinter.BOTH  )
@@ -1128,6 +1133,13 @@ class geom_gui(tkinter.Frame):
         plt.close('all')
         self.root.destroy()
 
+    def reload(self): 
+        self.varStatus.set('Attempting to reload.')
+        self.root.update()
+        #plt.close('all')
+        restart()
+
+
     def get_frames_for_cursor(self):
         w=[self.frameOuterPlot,self.frameTop,self.frameBottom]
         return w
@@ -1255,4 +1267,31 @@ def GUI(sss2_args=None,libfile=None):
 
     print('..main loop commencing..')
     root.mainloop()
+
+
+def restart():
+    """Restarts the current program, with file objects and descriptors
+        cleanup
+    From: https://stackoverflow.com/questions/11329917/restart-python-script-from-within-itself
+        """
+ 
+ 
+    import os
+    import sys
+    import psutil
+    import logging
+ 
+    print('Attempting to restart the program')
+     
+    try:
+        p = psutil.Process(os.getpid())
+        for handler in p.open_files() + p.connections():
+            os.close(handler.fd)
+    except Exception as e:
+        logging.error(e) 
+
+    print('    ...now.')
+    python = sys.executable
+    os.execl(python, python, *sys.argv)
+     
 
