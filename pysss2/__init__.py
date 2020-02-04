@@ -5,4 +5,4 @@
 
 from .pysss2 import *
 
-version = "0.1.dev4"
+version = "0.2.dev1"
