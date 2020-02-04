@@ -1,8 +1,15 @@
 # pysss2
 Python tools to interact with Serpent2 Monte Carlo code
 
-The key resource at the moment is the GUI to inspect Serpent2 geometries interactively.
-How to use it:
+
+
+
+The key resource at the moment is the **GUI to inspect Serpent2 geometries interactively**.
+
+When the python program launches, it launches serpent as a library using ctypes. 
+The python side of the code only accepts a single optional  first parameter:  "--libsss2so /path/to/libsss2.so". All the rest are passed on to serpent un-parsed. In other words, the other parameters are serpent's parameters, not for the python.
+
+How to use the GUI:
 
 1. Compile Serpent2 in a dedicated folder with interactive plotter settings on. At the time of writing (between Serpent versions 2.1.31 and 2.1.32) you need to have in Makefile:
    CFLAGS  += -DINTERACTIVE_PLOTTER -fPIC
