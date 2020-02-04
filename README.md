@@ -14,13 +14,9 @@ How to use the GUI:
 1. Compile Serpent2 in a dedicated folder with interactive plotter settings on. At the time of writing (between Serpent versions 2.1.31 and 2.1.32) you need to have in the Serpent Makefile:
 
 ```Makefile
-
 CFLAGS  += -DINTERACTIVE_PLOTTER -fPIC
-
 libsss2.so : $(OBJS)
-
-$(CC) -shared $(OBJS) $(LDFLAGS) -o $@
-
+	$(CC) -shared $(OBJS) $(LDFLAGS) -o $@
 ```
 
 2. In your serpent input file you need to 
