@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="pysss2",
-    version="0.2.dev1",
+    version="0.2.dev2",
     author="Simppa Äkäslompolo",
     author_email="simppa.akaslompolo@alumni.aalto.fi",
     description="Tools to interact with the Serpent2 Monte Carlo code",
@@ -20,6 +20,6 @@ setuptools.setup(
         "Operating System :: POSIX :: Linux",
         "Development Status :: 3 - Alpha"
     ],
-    python_requires='>=3.7',
+    python_requires='>=3.6.7',
     install_requires=['psutil','matplotlib>=3.1.1']
 )
