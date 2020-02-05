@@ -7,7 +7,7 @@ Python tools to interact with Serpent2 Monte Carlo code
 The key resource at the moment is the **GUI to inspect Serpent2 geometries interactively**. The program allows interactive plotting of various cross sections: xy, xz or yz slices. The plot limits and the number of pixels can be chosen and the resulting figures can be saved.
 
 
-## Usage (buttons on the right)##
+## Usage (buttons on the right) ##
 * Gray buttons change the view limits on the bar on top
   * *Geom. Limits* resets the default limts 
   * *View to limits* moves the current  zoomed in/out limits to the top bar
