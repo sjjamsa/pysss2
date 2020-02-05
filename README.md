@@ -4,7 +4,9 @@ Python tools to interact with Serpent2 Monte Carlo code
 
 
 
-The key resource at the moment is the **GUI to inspect Serpent2 geometries interactively**.
+The key resource at the moment is the **GUI to inspect Serpent2 geometries interactively**. The program allows interactive plotting of various cross sections: xy, xz or yz slices. The plot limits and the number of pixels can be chosen and the resulting figures can be saved.
+
+
 
 When the python program launches, it launches serpent as a library using ctypes. 
 The python side of the code only accepts a single optional  first parameter:  "--libsss2so /path/to/libsss2.so". All the rest are passed on to serpent un-parsed. In other words, the other parameters are serpent's parameters, not for the python.
