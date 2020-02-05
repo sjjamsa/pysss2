@@ -1,4 +1,4 @@
-# pysss2
+# pysss2 #
 Python tools to interact with Serpent2 Monte Carlo code
 
 
@@ -7,11 +7,25 @@ Python tools to interact with Serpent2 Monte Carlo code
 The key resource at the moment is the **GUI to inspect Serpent2 geometries interactively**. The program allows interactive plotting of various cross sections: xy, xz or yz slices. The plot limits and the number of pixels can be chosen and the resulting figures can be saved.
 
 
+## Usage (buttons on the right)##
+* Gray buttons change the view limits on the bar on top
+  * *Geom. Limits* resets the default limts 
+  * *View to limits* moves the current  zoomed in/out limits to the top bar
+* Green buttons updates the plots in addition to changing the values
+  * *View to limits & Upd* is just updating version of the gray button
+  * *V2L & P1:1 & Upd* does the same as above, but also tries to set the number of pixels to match the number of pixels on the displaying screen
+  * *V2L & P1:10 & Upd* does the same as above, but only has one calculated pixel for each 10x10 screen pixels
+* Yellow buttons change the slice (XY, XZ or YZ) to view:
+  * *to ?? & Upd* After clicking a yellow button, click on the plot to choose the location for the new slice
+* The red buttons:
+  * *Reload* Restarts the plotter, forcing Serpent to regenerate the geometry (e.g. after the input has been changed).
+  * *Quit* Exits the program.
+
 
 When the python program launches, it launches serpent as a library using ctypes. 
 The python side of the code only accepts a single optional  first parameter:  "--libsss2so /path/to/libsss2.so". All the rest are passed on to serpent un-parsed. In other words, the other parameters are serpent's parameters, not for the python.
 
-How to use the GUI:
+## How to install the GUI: ##
 
 1. Compile Serpent2 in a dedicated folder with interactive plotter settings on. At the time of writing (between Serpent versions 2.1.31 and 2.1.32) you need to have in the Serpent Makefile:
 
