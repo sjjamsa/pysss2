@@ -1107,7 +1107,7 @@ class geom_gui(tkinter.Frame):
                     self.clickCallBackFun(event)
 
         else:
-            print('Clicked ouside axes bounds but inside plot window')
+            print('Clicked outside axes bounds but inside plot window')
 
     def show_error(self, *args):
 
