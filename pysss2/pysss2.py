@@ -92,7 +92,12 @@ It's main job is to convert b/w python & numpy types and c types.
         #    print('"'+m.name.decode(_str_encoding)+'"')
         #    print('density',m.density)
         #    print('color',m.color[:])
+
+        self.sss2_getPositionInfo = self._sss2.getPositionInfo
+        self.sss2_getPositionInfo.restype = ctypes.c_long
+        # The argtypes need to be updated per call because length varies
         
+
 
 
         if not serpent_arguments is None:
@@ -276,6 +281,29 @@ It's main job is to convert b/w python & numpy types and c types.
 #        plt.colorbar()
 #        plt.show()
 
+    def get_positionInfo(self,xarr,yarr,zarr):
+
+        n=len(xarr)
+        if len(yarr) != n or len(zarr) != n:
+            raise ValueError('xarr,yarr,zarr must be same size')
+
+        pinfos = ( pinfo* n )()
+        self.sss2_getPositionInfo.argtypes = [ ctypes.c_long, pinfo*n, ]
+        
+        for i in range(n):
+            pinfos[i].x=xarr[i]
+            pinfos[i].y=yarr[i]
+            pinfos[i].z=zarr[i]
+            pinfos[i].time=0.0
+        
+        status = self.sss2_getPositionInfo(n,pinfos)
+        if status!= 0:
+            print('getPositionInfo return status was {}, continuing.'.format(status))        
+
+        return pinfos
+
+    
+
 class geom_stats(ctypes.Structure):
     ''' See pythonplotter.h for the C definition
     '''
@@ -295,8 +323,31 @@ class material(ctypes.Structure):
                ('color',             ctypes.c_long * 3 ),       #  R,G,B 
                ('numberOfNuclides',  ctypes.c_long     ),       #  For a future implementation of a routine that reads the nuclide list.
                ('name',              ctypes.c_char * _MAX_STR)] #  Null terminated 
-    
-    
+
+
+class pinfo(ctypes.Structure):
+    ''' This struct reflects the C definition
+
+    '''
+    _fields_ =[('x',             ctypes.c_double         ),       #  cm 
+               ('y',             ctypes.c_double         ),       #  cm 
+               ('z',             ctypes.c_double         ),       #  cm 
+               ('time',          ctypes.c_double         ),       #  IGNORED 
+               ('universe',      ctypes.c_long           ),       #  
+               ('universe_name', ctypes.c_char * _MAX_STR),       #  Null terminated   
+               ('cell',          ctypes.c_long           ),       #  
+               ('cell_name',     ctypes.c_char * _MAX_STR),       #   
+               ('material',      ctypes.c_long           ),       #  
+               ('material_name', ctypes.c_char * _MAX_STR),       #   
+               ]                                                   
+    def __str__(self):
+        out = ""
+        out += "(x,y,z)=({},{},{})\n".format(self.x,self.y,self.z)
+        out += "univ {:3d}:{}\n".format(self.universe,self.universe_name.decode(_str_encoding))
+        out += "cell {:3d}:{}\n".format(self.cell,    self.cell_name.decode(_str_encoding))
+        out += "mat  {:3d}:{}\n".format(self.material,    self.material_name.decode(_str_encoding))
+
+        return out
         
 class geom_gui(tkinter.Frame):
     
@@ -335,6 +386,7 @@ class geom_gui(tkinter.Frame):
         self.btnGoXY[        'command']=self.to_XY_slice
         self.btnGoXZ[        'command']=self.to_XZ_slice
         self.btnGoYZ[        'command']=self.to_YZ_slice
+        self.btnEvalPos[     'command']=self.eval_pos
         self.btnQuit[        'command']=self.quit
         self.btnReload[      'command']=self.reload
         self.varType.trace('w',self.set_Slicer_limits_trace)
@@ -556,6 +608,8 @@ class geom_gui(tkinter.Frame):
         self.btnGoYZ                = tkinter.Button(self.frameButtonBar, text='to YZ & Upd', state=tkinter.NORMAL, bg='yellow')
         self.btnGoYZ.pack(side = tkinter.TOP, fill=tkinter.X, expand=False)
 
+        self.btnEvalPos                = tkinter.Button(self.frameButtonBar, text='eval pos', state=tkinter.NORMAL, bg='blue')
+        self.btnEvalPos.pack(side = tkinter.TOP, fill=tkinter.X, expand=False, pady=(separatorPadding, 0))
         
 
 
@@ -583,6 +637,7 @@ class geom_gui(tkinter.Frame):
 
         self.statusBar     = tkinter.Label(self.frameBottom, textvariable=self.varStatus,relief=tkinter.SUNKEN,width=self.statusBarWidth).pack(side=tkinter.RIGHT)
         
+        
 
     def to_XY_slice(self):
         self.varStatus.set('Choose the new z-value [to xy]')
@@ -599,6 +654,36 @@ class geom_gui(tkinter.Frame):
         self.clickCallBackFun = self.to_YZ_slice_exec
         self.to_XYZ_slice('yz')
 
+    def eval_pos(self):
+        self.varStatus.set('Click to eval geom. at location')
+        self.clickCallBackFun = self.eval_pos_exec
+        
+    def eval_pos_exec(self,event):
+        
+        currType = self.varType.get()
+        d = float( self.varSlice.get() )
+
+        if currType == 'xy':
+            x = event.xdata
+            y = event.ydata
+            z = d
+            
+        elif currType == 'yz':
+            x = d
+            y = event.xdata
+            z = event.ydata
+
+        if currType == 'xz':
+            x = event.xdata
+            y = d
+            z = event.ydata
+
+        
+        self.varStatus.set( "See terminal for results; (x,y,z)=({},{},{})".format(x,y,z))
+
+        pinfo=self._sss2.get_positionInfo([x],[y],[z])
+        
+        print (pinfo[0])
 
     def to_XYZ_slice(self,toSlice):
 
