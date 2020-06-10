@@ -608,7 +608,7 @@ class geom_gui(tkinter.Frame):
         self.btnGoYZ                = tkinter.Button(self.frameButtonBar, text='to YZ & Upd', state=tkinter.NORMAL, bg='yellow')
         self.btnGoYZ.pack(side = tkinter.TOP, fill=tkinter.X, expand=False)
 
-        self.btnEvalPos                = tkinter.Button(self.frameButtonBar, text='eval pos', state=tkinter.NORMAL, bg='blue')
+        self.btnEvalPos                = tkinter.Button(self.frameButtonBar, text='eval pos', state=tkinter.NORMAL, bg='light sky blue')
         self.btnEvalPos.pack(side = tkinter.TOP, fill=tkinter.X, expand=False, pady=(separatorPadding, 0))
         
 
@@ -678,11 +678,17 @@ class geom_gui(tkinter.Frame):
             y = d
             z = event.ydata
 
+        self.varStatus.set( "Evaluating cell/univ/mat at (x,y,z)=({},{},{})".format(x,y,z))
         
-        self.varStatus.set( "See terminal for results; (x,y,z)=({},{},{})".format(x,y,z))
-
         pinfo=self._sss2.get_positionInfo([x],[y],[z])
-        
+
+        self.varStatus.set( 
+            "U{}:{} C{}:{} M{}:{}".format(
+                pinfo[0].universe,pinfo[0].universe_name.decode(_str_encoding),
+                pinfo[0].cell,    pinfo[0].cell_name.decode(    _str_encoding),
+                pinfo[0].material,pinfo[0].material_name.decode(_str_encoding)  )
+            )
+             
         print (pinfo[0])
 
     def to_XYZ_slice(self,toSlice):
