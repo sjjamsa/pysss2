@@ -338,7 +338,8 @@ class pinfo(ctypes.Structure):
                ('cell',          ctypes.c_long           ),       #  
                ('cell_name',     ctypes.c_char * _MAX_STR),       #   
                ('material',      ctypes.c_long           ),       #  
-               ('material_name', ctypes.c_char * _MAX_STR),       #   
+               ('material_name', ctypes.c_char * _MAX_STR), 
+               ('material_color_RGB',ctypes.c_long * 3   ),      #   
                ]                                                   
     def __str__(self):
         out = ""
@@ -346,6 +347,8 @@ class pinfo(ctypes.Structure):
         out += "univ {:3d}:{}\n".format(self.universe,self.universe_name.decode(_str_encoding))
         out += "cell {:3d}:{}\n".format(self.cell,    self.cell_name.decode(_str_encoding))
         out += "mat  {:3d}:{}\n".format(self.material,    self.material_name.decode(_str_encoding))
+        out += "mat_color {:3d},{:3d},{:3d}\n".format(
+            self.material_color_RGB[0],     self.material_color_RGB[1],     self.material_color_RGB[2] )
 
         return out
         
