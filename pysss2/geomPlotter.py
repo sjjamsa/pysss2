@@ -912,7 +912,14 @@ class geom_gui(tkinter.Frame):
         self.varStatus.set('Attempting to reload.')
         self.root.update()
         #plt.close('all')
-        restart()
+
+        result= self._sss2.sss2_free()
+        
+        self.varStatus.set('FreeMem() completed (status {})'.format(result))
+        
+        self.run_serpent()
+        
+        # restart_old()
 
 
     def get_frames_for_cursor(self):
@@ -1042,9 +1049,9 @@ def GUI(sss2_args=None,libfile=None):
 
     print('..main loop commencing..')
     root.mainloop()
+    
 
-
-def restart():
+def restart_old():
     """Restarts the current program, with file objects and descriptors
         cleanup
     From: https://stackoverflow.com/questions/11329917/restart-python-script-from-within-itself

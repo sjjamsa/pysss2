@@ -29,7 +29,7 @@ It's main job is to convert b/w python & numpy types and c types.
         print('Loading serpent shared library "'+self._soFilename+'".')
         self._sss2=ctypes.cdll.LoadLibrary(self._soFilename)
 
-        self.sss2_main = self._sss2.main 
+        self.sss2_main = self._sss2.init_interactive 
         self.sss2_main.restype  =  ctypes.c_int
         # The argtypes of main need to be updated per call because length varies
 
@@ -74,6 +74,9 @@ It's main job is to convert b/w python & numpy types and c types.
         # The argtypes need to be updated per call because length varies
         
 
+        self.sss2_free = self._sss2.free_interactive
+        self.sss2_free.restype = ctypes.c_int
+        self.sss2_free.argtypes = []
 
 
         if not serpent_arguments is None:
