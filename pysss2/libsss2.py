@@ -33,10 +33,6 @@ It's main job is to convert b/w python & numpy types and c types.
         self.sss2_main.restype  =  ctypes.c_int
         # The argtypes of main need to be updated per call because length varies
 
-        self.sss2_getGeometryPlotMatrix = self._sss2.getGeometryPlotMatrix
-        self.sss2_getGeometryPlotMatrix.restype  =  ctypes.c_long
-        # The argtypes need to be updated per call because length varies
-
 
         self.sss2_getGeometryParameters = self._sss2.getGeometryParameters
         self.type_geom_stats = geom_stats
@@ -128,110 +124,6 @@ It's main job is to convert b/w python & numpy types and c types.
 
         return status
 
-
-    def get_geometryPlot_raw(self,
-                         plane, xpix, ypix, pos,
-                         xmin=-_INFTY, xmax=_INFTY, 
-                         ymin=-_INFTY, ymax=_INFTY,
-                         zmin=-_INFTY, zmax=_INFTY):
-        """
-        Get a single plot from Serpent.
-        """
-
-
-
-        nPix =  xpix * ypix
-        nCol =  3 * _COLOURS
-
-        self.sss2_getGeometryPlotMatrix.argtypes = [ctypes.c_long, # (plane), 
-                                                    ctypes.c_long, # (xpix),
-                                                    ctypes.c_long, # (ypix), 
-                                                    ctypes.c_double, # (pos),
-                                                    ctypes.c_double, # (xmin), 
-                                                    ctypes.c_double, # (xmax),
-                                                    ctypes.c_double, # (ymin), 
-                                                    ctypes.c_double, # (ymax),
-                                                    ctypes.c_double, # (zmin), 
-                                                    ctypes.c_double, # (zmax),
-                                                    ctypes.c_long * nPix, # (matrix),
-                                                    ctypes.c_long * nCol  # (rgb)
-                                                    ]
-
-        # The datatypes are 1D-arrays of longs.
-        matrix = (ctypes.c_long * nPix)()
-        rgb    = (ctypes.c_long * nCol)()
-        status = self.sss2_getGeometryPlotMatrix(ctypes.c_long(plane), 
-                                                  ctypes.c_long(xpix),
-                                                  ctypes.c_long(ypix), 
-                                                  ctypes.c_double(pos),
-                                                  ctypes.c_double(xmin), 
-                                                  ctypes.c_double(xmax),
-                                                  ctypes.c_double(ymin), 
-                                                  ctypes.c_double(ymax),
-                                                  ctypes.c_double(zmin), 
-                                                  ctypes.c_double(zmax),
-                                                  matrix, rgb)
-        if status != 0:
-            print('sss2 getGeometryPlotMatrix() returned {}. Continuing still.'.format(status))
-
-
-
-        M   = np.reshape(np.frombuffer(matrix,dtype=int),(xpix,ypix) ) 
-        colorPalette = np.reshape(np.frombuffer(rgb,dtype=int),(_COLOURS,3) )
-
-        # We need to take the transpose.
-        M = M.T
-    
-
-        # Fix a historical thing...
-        if plane == 3:
-            M = np.flipud(M)
-
-        # Matplotlib expects to have colors in the 0...1 scale
-        cp = colorPalette / 255.0
-
-        return M,cp
-
-
-    def get_geometryPlot(self,
-                         plane, xpix, ypix, pos,
-                         min1=_INFTY, max1=_INFTY, 
-                         min2=_INFTY, max2=_INFTY):
-        if plane == 'xy' or plane == 3:
-            xmin = min1
-            xmax = max1
-            ymin = min2
-            ymax = max2
-            zmin = -_INFTY
-            zmax =  _INFTY
-            nplane = 3
-
-        elif plane == 'xz' or plane == 2:
-            xmin = min1
-            xmax = max1
-            ymin = -_INFTY
-            ymax =  _INFTY
-            zmin = min2
-            zmax = max2
-            nplane = 2
-
-        elif plane == 'yz' or plane == 1:
-            xmin = -_INFTY
-            xmax =  _INFTY
-            ymin = min1
-            ymax = max1
-            zmin = min2
-            zmax = max2
-            nplane = 1
-
-        else:
-            raise RuntimeError('Unexpected type of plot "'+str(plane)+'"!') 
-        
-        return self.get_geometryPlot_raw(
-            plane=nplane, xpix=xpix, ypix=ypix, pos=pos,
-            xmin=xmin, xmax=xmax, 
-            ymin=ymin, ymax=ymax,
-            zmin=zmin, zmax=zmax)
 
 
     def get_materials(self):

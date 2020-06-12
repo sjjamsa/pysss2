@@ -554,125 +554,6 @@ class geom_gui(tkinter.Frame):
 
 
 
-    def updateGeomPlot_old(self):
-
-        self.varStatus.set("Updating from Serpent...")
-        self.cursor_busy()
-        self.root.update()
-
-        # is update enough, or should we draw a new image
-        updateIm = False
-
-        fig     = self.MatPlotFig
-        canvas  = self.MatPlotCanvas 
-        
-
-        self.set_Slicer_limits()
-
-        min1,max1,min2,max2,nPix1,nPix2,coord,typ,xlabel,ylabel,zlabel = self.getParams()
-
-        
-
-        nx=nPix1
-        ny=nPix2
-        extent=(min1, max1, min2, max2)
-        #arr=np.random.randint(low=0,high=nColors-1,size=(nx,ny))
-        
-        arr,rgb = self._sss2.get_geometryPlot(
-                         typ, nPix1, nPix2, coord,
-                         min1=min1, max1=max1, 
-                         min2=min2, max2=max2)
-
-
-        colornames = ['Void/boundary','No cell', 'Multiple cell', 'Pointer error', 'Missing IFC data']
-        nFixed = len(colornames)
-
-
-        #print(rgb)
-
-        #self.nColors = rgb.shape[1]
-        #self.nColors = np.max(arr)+1
-        self.nColors = nFixed + len(self.materials)
-        #print(self.nColors)
-
-
-        cm = self.generate_colormap( rgb[:self.nColors,:] )
-
-        for i in range(nFixed,self.nColors):
-            colornames.append("Mat {:03d}".format(i-nFixed))
-        for i in range(len(self.materials)):
-            colornames[i+nFixed] = self.materials[i].name.decode(_str_encoding)
-
-
-        if updateIm:
-
-            ai      = self.MatPlotAxesImage
-            cb      = self.MatPlotColorbar
-            ai.set_data(arr)
-            ai.set_extent(extent)
-            ai.set_cmap(cm)
-            ai.set_clim(-0.5,self.nColors-0.5)
-
-            #print(colornames)
-
-        else:
-            #make a new image / empty the canvas
-            fig.clear()
-            ax = fig.add_subplot(111)
-
-            clim=(-0.5,self.nColors-0.5)
-            ai = ax.imshow(arr, extent=(min1, max1, min2, max2),cmap=cm,vmin=clim[0],vmax=clim[1])
-            cb = fig.colorbar(ai, ax=ax)
-
-            self.MatPlotAxesImage = ai
-            self.MatPlotColorbar  = cb
-            self.MatPlotAx        = ax
-
-        cb.set_ticks(range(self.nColors))
-        cb.ax.set_yticklabels(colornames)
-
-            
-
-        ax.set_xlabel(xlabel+" (cm)")
-        ax.set_ylabel(ylabel+" (cm)")
-        ax.set_title(zlabel+'= '+str(coord)+' cm')
-        
-        ax.set_xlim( (min1, max1) )
-        ax.set_ylim( (min2, max2) )
-        ax.set_aspect('equal')
-
-
-
-        #ax.invert_yaxis()
-        canvas.draw()
-
-        self.varStatus.set("Ready.")
-        self.cursor_normal()
-        self.root.update()
-
-
-    def updateTestMatPlotLibImage(self):
-        ai      = self.MatPlotAxesImage
-        nColors = self.nColors
-        canvas  = self.MatPlotCanvas 
-        ax      = self.MatPlotAx      
-
-        min1,max1,min2,max2,nPix1,nPix2,coord,typ,xlabel,ylabel,zlabel = self.getParams()
-
-        nx=nPix1
-        ny=nPix2
-        extent=(min1, max1, min2, max2)
-        arr=np.random.randint(low=0,high=nColors-1,size=(nx,ny))
-
-        ax.set_xlabel(xlabel+" (cm)")
-        ax.set_ylabel(ylabel+" (cm)")
-        ax.set_title(zlabel+'= '+str(coord)+' cm')
-
-
-        ai.set_data(arr)
-        ai.set_extent(extent)
-        canvas.draw()
-
 
     def makeFigure(self):
         #https://matplotlib.org/3.1.0/gallery/user_interfaces/embedding_in_tk_sgskip.html
@@ -722,112 +603,6 @@ class geom_gui(tkinter.Frame):
         #canvas.mpl_connect("key_press_event", self.on_mpl_key_press)
         canvas.callbacks.connect('button_press_event', self.showXY_handler)
 
-
-
-    def makeTestMatPlotLibImage(self,root):
-        #https://matplotlib.org/3.1.0/gallery/user_interfaces/embedding_in_tk_sgskip.html
-        from matplotlib.backends.backend_tkagg import (
-                FigureCanvasTkAgg, NavigationToolbar2Tk)
-        from matplotlib.figure import Figure
-        #import matplotlib.colorbar 
-        from matplotlib import cm
-
-        fig = Figure(figsize=(5,4),dpi=100)
-
-        min1,max1,min2,max2,nPix1,nPix2,coord,typ,xlabel,ylabel,zlabel = self.getParams()
-
-        nx=nPix1
-        ny=nPix2
-
-        colornames=['a','b','c','d','e','f','g','a2','b2','c2','d2','e2','f2','g2','foo','bar_k']
-        nColors=len(colornames)
-
-        #cm = plt.get_cmap('RdGy',nColors)
-        cm = self.generate_colormap( np.random.uniform(size=(nColors,3)))
-
-    
-        arr=np.random.randint(low=0,high=nColors-1,size=(nx,ny))
-
-        ax = fig.add_subplot(111)
-        clim=(-0.5,nColors-0.5)
-        ai = ax.imshow(arr, extent=(min1, max1, min2, max2),cmap=cm,vmin=clim[0],vmax=clim[1])
-
-
-        cb = fig.colorbar(ai, ax=ax)
-        ax.set_xlabel(xlabel+" (cm)")
-        ax.set_ylabel(ylabel+" (cm)")
-        cb.set_ticks(range(nColors))
-        cb.ax.set_yticklabels(colornames)
-
-
-        ax.set_title(zlabel+'= '+str(coord)+' cm')
-
-        canvas = FigureCanvasTkAgg(fig, master=root)  # A tk.DrawingArea.
-        canvas.draw()
-        canvas.get_tk_widget().pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=True)
-
-        #https://stackoverflow.com/questions/26064465/using-matplotlibs-ginput-function-with-tkinter-gui
-        #self.bind("<Button-1>",self.showXY_handler)
-        
-        
-     
-
-        
-        toolbar = NavigationToolbar2Tk(canvas, root)
-        toolbar.update()
-        
-        canvas.get_tk_widget().pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=True)
-
-
-        self.MatPlotAxesImage = ai
-        self.MatPlotCanvas  = canvas
-        self.MatPlotToolbar = toolbar
-        self.MatPlotAx      = ax
-        self.MatPlotFig     = fig
-        self.nColors        = nColors
-        self.MatPlotColorbar= cb
-
-        self.select_rectangle_create()
-
-        #canvas.mpl_connect("key_press_event", self.on_mpl_key_press)
-        canvas.callbacks.connect('button_press_event', self.showXY_handler)
-
-    def makeTestMatPlotLibPlot(self,root):
-        #https://matplotlib.org/3.1.0/gallery/user_interfaces/embedding_in_tk_sgskip.html
-        from matplotlib.backends.backend_tkagg import (
-                FigureCanvasTkAgg, NavigationToolbar2Tk)
-        from matplotlib.figure import Figure
-        
-        fig = Figure(figsize=(5,4),dpi=100)
-        x=np.linspace(0,3*2*np.pi,721)
-        y=np.sin(x)
-        ax = fig.add_subplot(111)
-        ax.plot(x,y)
-        
-        canvas = FigureCanvasTkAgg(fig, master=root)  # A tk.DrawingArea.
-        canvas.draw()
-        canvas.get_tk_widget().pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=True)
-
-        #https://stackoverflow.com/questions/26064465/using-matplotlibs-ginput-function-with-tkinter-gui
-        #self.bind("<Button-1>",self.showXY_handler)
-        
-        
-     
-
-        
-        toolbar = NavigationToolbar2Tk(canvas, root)
-        toolbar.update()
-        
-        canvas.get_tk_widget().pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=True)
-
-
-        self.MatPlotCanvas  = canvas
-        self.MatPlotToolbar = toolbar
-        self.MatPlotAx      = ax
-        self.MatPlotFig     = fig
-
-        #canvas.mpl_connect("key_press_event", self.on_mpl_key_press)
-        canvas.callbacks.connect('button_press_event', self.showXY_handler)
 
     def selection_to_limits(self):
         self.varMin1.set(str(self.selectedRectangle[0]))
@@ -975,9 +750,6 @@ class geom_gui(tkinter.Frame):
         self.geom_stats = self._sss2.getGeometryParameters()
         self.set_limits_to_geometry()
 
-    def retrieveMaterials(self):
-        self.materials = self._sss2.get_materials()
-
     def set_limits_to_geometry(self):
 
         T= self.varType.get() 
@@ -1073,7 +845,6 @@ def GUI(sss2_args=None,libfile=None):
         G.root.update()
         G._sss2 = sss2(serpent_arguments=sss2_args,libfile=libfile)
         G.retrieveGeometryStats()
-        G.retrieveMaterials()
         G.varStatus.set('Serpent initialized...Check console for output')
         G.cursor_normal()
 
