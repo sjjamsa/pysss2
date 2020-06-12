@@ -58,12 +58,21 @@ class cartesian_plotter(object):
         
         return cm,names
 
-    def customize_colorbar(self,cb,names):
+    def mk_colorbar(self,fig):
+        
+        cm,names=self.mk_colormap()
+            
         n=len(names)
         bounds = np.arange(1,n+1,1,dtype=int)
- 
         
-        cb.set_ticks(bounds) 
+        
+        
+        norm = matplotlib.colors.Normalize(vmin=0.5,vmax=n+0.5)
+        sm = plt.cm.ScalarMappable(cmap=cm, norm=norm)
+        sm.set_array([])
+        cb=fig.colorbar(sm, ticks=bounds)
+        
+        #cb.set_ticks(bounds) 
         cb.set_ticklabels(names)      
         #cb = matplotlib.colorbar.ColorbarBase(cmap=cm,ticks=bounds)
         #cb = plt.colorbar(cmap=cm,ticks=bounds)
@@ -207,26 +216,28 @@ class cartesian_plotter(object):
                 imdata[iy,ix,:] = self.pinfo_array[ix,iy].material_color_RGB
         return imdata
     
-    def plot(self):
+    def plot(self,ax=None,fig=None):
         
         #aspect='auto'
         aspect='equal'
         
-        cm,names=self.mk_colormap()
-        
-        nMaterials = cm.N
 
-        ax = plt.imshow(self.get_imdata(),aspect=aspect,origin='lower',
-                        extent=(self.xmin,self.xmax,self.ymin,self.ymax),
-                        cmap=cm,vmin=0.5, vmax=nMaterials+0.5)
-        plt.xlabel(self.x_label)
-        plt.ylabel(self.y_label)
-        plt.xlim((self.xmin,self.xmax))
-        plt.ylim((self.ymin,self.ymax))
+
+        if ax  is None:
+            ax  = plt.gca()
+        if fig is None:
+            fig = plt.gcf()
+
+        ai =ax.imshow(X=self.get_imdata(),aspect=aspect,origin='lower',
+                        extent=(self.xmin,self.xmax,self.ymin,self.ymax) )
+        ax.set_xlabel(self.x_label)
+        ax.set_ylabel(self.y_label)
+        ax.set_xlim((self.xmin,self.xmax))
+        ax.set_ylim((self.ymin,self.ymax))
         #plt.gca().set_aspect('equal', 'box')
-        cb=plt.colorbar()
+        #cb=fig.colorbar()
         
-        self.customize_colorbar(cb,names)
+        cb=self.mk_colorbar(fig)
         
-        return ax
+        return ax,cb,ai
         

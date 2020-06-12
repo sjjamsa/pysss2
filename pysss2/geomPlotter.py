@@ -12,6 +12,7 @@ import numpy as np
 
 from .libsss2 import _str_encoding
 from .libsss2 import sss2
+import pysss2.slicer
 
 #_LIBFILE="/homeappl/home/sjjamsa/serpent/compile_for_GUI/libsss2.so"
 SERPENT="""
@@ -518,6 +519,42 @@ class geom_gui(tkinter.Frame):
         return cm
 
     def updateGeomPlot(self):
+        self.varStatus.set("Updating from Serpent...")
+        self.cursor_busy()
+        self.root.update()
+
+        
+        currType = self.varType.get()
+
+        self.set_Slicer_limits()
+
+        min1,max1,min2,max2,nPix1,nPix2,coord,typ,xlabel,ylabel,zlabel = self.getParams()
+        nx=nPix1
+        ny=nPix2
+
+        S=pysss2.slicer.cartesian_plotter()
+        S.from_cartesian(nx,ny,cut_type=currType,
+                         min1=min1, max1=max1,
+                         min2=min2, max2=max2,
+                         d3=coord);
+        S.eval_arrays(self._sss2);
+        
+        self.MatPlotFig.clear()
+        self.MatPlotAx = self.MatPlotFig.add_subplot(111)
+
+        _,self.MatPlotColorbar,self.MatPlotAxesImage=S.plot(ax=self.MatPlotAx,fig=self.MatPlotFig)
+
+ 
+        self.MatPlotCanvas.draw()
+
+        self.varStatus.set("Ready.")
+        self.cursor_normal()
+        self.root.update()
+
+
+
+
+    def updateGeomPlot_old(self):
 
         self.varStatus.set("Updating from Serpent...")
         self.cursor_busy()
