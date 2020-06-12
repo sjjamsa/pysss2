@@ -8,7 +8,7 @@ if __name__=="__main__":
     print('..python started..')
 
     import sys
-    import pysss2
+    import pysss2.geomPlotter
 
     print('..pysss2 version '+pysss2.version+'..')
 
@@ -37,4 +37,4 @@ The "-interactiveplotter" is mandatory for correct operation.
         #sss2_args=None
 
 
-    pysss2.GUI( sss2_args=sss2_args,libfile=libfile)
+    pysss2.geomPlotter.GUI( sss2_args=sss2_args,libfile=libfile)

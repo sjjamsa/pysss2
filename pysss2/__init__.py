@@ -3,6 +3,12 @@
 # 
 #
 
-from .pysss2 import *
+#from .geomPlotter import *
+#from .libsss2 import *
+#from .slicer import *
 
-version = "0.2.dev2"
+from . import geomPlotter
+from . import libsss2
+from . import slicer
+
+version = "0.2.dev6"
