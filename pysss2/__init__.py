@@ -11,4 +11,4 @@ from . import geomPlotter
 from . import libsss2
 from . import slicer
 
-version = "0.2.dev6"
+version = "0.3.dev1"

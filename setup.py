@@ -1,11 +1,12 @@
 import setuptools
+from pysss2.__init__ import version
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
     name="pysss2",
-    version="0.2.dev2",
+    version=version,
     author="Simppa Äkäslompolo",
     author_email="simppa.akaslompolo@alumni.aalto.fi",
     description="Tools to interact with the Serpent2 Monte Carlo code",
