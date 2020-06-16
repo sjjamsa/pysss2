@@ -19,8 +19,13 @@ class sss2():
     """ This class is a wrapper to serpent2.
 It's main job is to convert b/w python & numpy types and c types.
 """
+
     
     def __init__(self,serpent_arguments=None,libfile=None):
+        self.SUPPORTED_PYTHONPLOTTER_INTERFACE_VERSION = 11
+
+        
+        
         if libfile is None:
             self._soFilename=_LIBFILE
         else:
@@ -29,55 +34,47 @@ It's main job is to convert b/w python & numpy types and c types.
         print('Loading serpent shared library "'+self._soFilename+'".')
         self._sss2=ctypes.cdll.LoadLibrary(self._soFilename)
 
+        #### init_interactive ####
         self.sss2_main = self._sss2.init_interactive 
         self.sss2_main.restype  =  ctypes.c_int
         # The argtypes of main need to be updated per call because length varies
 
 
+        #### getGeometryParameters ####
         self.sss2_getGeometryParameters = self._sss2.getGeometryParameters
         self.type_geom_stats = geom_stats
         self.sss2_getGeometryParameters.restype  = ctypes.c_long
         self.sss2_getGeometryParameters.argtypes = [ctypes.POINTER(self.type_geom_stats)]
 
-        #print('Testing the struct thing')
-        #gs = self.getGeometryParameters()
-        #print('geom_stats',gs)
-        #print('xmin=',gs.xmin,' xmax=',gs.xmax)
-        #print('ymin=',gs.ymin,' xmax=',gs.ymax)
-        #print('zmin=',gs.zmin,' xmax=',gs.zmax)
-        #print('')
 
-
+        #### getNumberOfMaterials ####
         self.sss2_getNumberOfMaterials = self._sss2.getNumberOfMaterials
         self.sss2_getNumberOfMaterials.restype = ctypes.c_long
         self.sss2_getNumberOfMaterials.argtypes = [ctypes.POINTER(ctypes.c_long)]
 
+        #### getMaterials ####
         self.sss2_getMaterials = self._sss2.getMaterials
         self.sss2_getMaterials.restype = ctypes.c_long
         # The argtypes need to be updated per call because length varies
 
-        #print('Testing the materials thing')
-        #materials = self.get_materials()
-        #print( 'len(materials)=',len(materials) )
-        #print( 'materials=',materials)
-        #for m in materials:
-        #    print('"'+m.name.decode(_str_encoding)+'"')
-        #    print('density',m.density)
-        #    print('color',m.color[:])
-
+        #### getPositionInfo ####
         self.sss2_getPositionInfo = self._sss2.getPositionInfo
         self.sss2_getPositionInfo.restype = ctypes.c_long
         # The argtypes need to be updated per call because length varies
         
-
+        #### free ####
         self.sss2_free = self._sss2.free_interactive
         self.sss2_free.restype = ctypes.c_int
         self.sss2_free.argtypes = []
 
+        #### getVersion ####
+        self.sss2_getVersion = self._sss2.getVersion
+        self.sss2_getVersion.restype = ctypes.c_long
+        self.sss2_getVersion.argtypes = [ctypes.POINTER(ctypes.c_char*_MAX_STR) , ctypes.POINTER(ctypes.c_long)]
 
         if not serpent_arguments is None:
-            status = self.start_run(serpent_arguments)
-
+            _ = self.start_run(serpent_arguments)
+            
         
 
     def getGeometryParameters(self):
@@ -100,6 +97,20 @@ It's main job is to convert b/w python & numpy types and c types.
         """ Start serpent with the parameters given in serpent_arguments.
         serpent_arguments : List of strings
         """
+        
+        # Start by checking the version
+        
+        #serpent_version= (ctypes.c_char * _MAX_STR)()
+        serpent_version = ctypes.create_string_buffer(_MAX_STR)
+        pythonplotter_version = ctypes.c_long()
+        
+        self.sss2_getVersion(ctypes.byref(serpent_version),ctypes.byref(pythonplotter_version))
+                
+        print('Serpent version {}'.format(serpent_version.value.decode(_str_encoding)))
+        print('Python plotter interface version {}'.format(pythonplotter_version.value))
+        
+        self.check_pythonplotter_version(pythonplotter_version.value)
+        
         
         if not type(serpent_arguments) is list:
             raise ValueError('The serpent_arguments is not a List, it is {}'.format(str(type(serpent_arguments))))
@@ -124,6 +135,13 @@ It's main job is to convert b/w python & numpy types and c types.
 
         return status
 
+    def check_pythonplotter_version(self,pythonplotter_version):
+
+        
+        if pythonplotter_version != self.SUPPORTED_PYTHONPLOTTER_INTERFACE_VERSION:
+
+            raise RuntimeError("Wrong version of python plotter ({}), version {} needed.".format(
+                pythonplotter_version, self.SUPPORTED_PYTHONPLOTTER_INTERFACE_VERSION))
 
 
     def get_materials(self):
