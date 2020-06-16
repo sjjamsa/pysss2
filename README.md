@@ -30,6 +30,9 @@ The python side of the code only accepts a single optional  first parameter:  "-
 ## How to install and run the GUI: ##
 
 1. **Install pysss2 with pip**, as explained in the [pypi page](https://pypi.org/project/pysss2/) of the project.
+   1. The code uses python 3. It is known to work at least with version 3.6.7. You can check the current with e.g. 
+   "python3 -c "import sys; print(sys.version)".
+   2. There was [a bug in matplotlib](https://github.com/matplotlib/matplotlib/issues/14781), so 'matplotlib>=3.1.1' is needed. You can check the current version with e.g. "python3 -c "import matplotlib; print(matplotlib.__version__)"
 
 2.  **Compile the "lib" target (possibly in a dedicated folder) with the -fpic setting enabled in Makefile.** (That is, uncomment the line _"CFLAGS += -fpic"_. Then run _"make clean"_  and then _"make lib"_. The result should be a shared library called libssss2.so. This file includes all the routines of serpent, but they can be called from other programs.
 
