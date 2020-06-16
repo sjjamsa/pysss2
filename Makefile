@@ -14,7 +14,10 @@ uninstall : files.txt
 testpypi: distfiles
 	python3 -m twine upload --repository-url https://test.pypi.org/legacy/ dist/*
 
+pypi: distfiles
+	python3 -m twine upload  dist/*
+
 
 clean : 
-	python setup.py clean --all
+	python3 setup.py clean --all
 	rm -fv dist/*
