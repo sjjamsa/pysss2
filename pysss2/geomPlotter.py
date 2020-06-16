@@ -731,7 +731,6 @@ class geom_gui(tkinter.Frame):
         
         self.run_serpent()
         
-        # restart_old()
 
 
     def get_frames_for_cursor(self):
@@ -859,29 +858,4 @@ def GUI(sss2_args=None,libfile=None):
     root.mainloop()
     
 
-def restart_old():
-    """Restarts the current program, with file objects and descriptors
-        cleanup
-    From: https://stackoverflow.com/questions/11329917/restart-python-script-from-within-itself
-        """
- 
- 
-    import os
-    import sys
-    import psutil
-    import logging
- 
-    print('Attempting to restart the program')
-     
-    try:
-        p = psutil.Process(os.getpid())
-        for handler in p.open_files() + p.connections():
-            os.close(handler.fd)
-    except Exception as e:
-        logging.error(e) 
-
-    print('    ...now.')
-    python = sys.executable
-    os.execl(python, python, *sys.argv)
-     
 
