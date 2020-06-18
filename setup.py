@@ -22,5 +22,6 @@ setuptools.setup(
         "Development Status :: 3 - Alpha"
     ],
     python_requires='>=3.6.7',
-    install_requires=['matplotlib>=3.1.1']
+    install_requires=['matplotlib>=3.1.1'],
+    include_package_data=True
 )

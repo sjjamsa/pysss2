@@ -39,6 +39,7 @@ class geom_gui(tkinter.Frame):
     def __init__(self,root):
         super().__init__()
         self.root = root
+        self.set_window_icon()
         self.generate_gui()
         self.selectedRectangle = (0.0, 0.0, 0.0, 0.0)
 
@@ -804,6 +805,23 @@ class geom_gui(tkinter.Frame):
         self.varParams.set(string)
 
         
+    def set_window_icon(self):
+        #print('Setting window icon')
+        try:
+            import pkg_resources
+            icon_path = pkg_resources.resource_filename(__name__, "icon.png")
+            #print('Setting window icon path = {}'.format(icon_path))
+            self.root.iconphoto(False, tkinter.PhotoImage(file=icon_path))
+            self.root.wm_command('sss2')
+            self.root.wm_iconname('Sss2')
+        except Exception as exc:
+            # We don't really mind if we can't set the icon.
+            print(exc) # For debugging
+            _ = exc # Does nothing, but at least the exc is used and doesn't raise warnings for unused variables.
+            pass
+
+        
+        
 def test():
     root = tkinter.Tk()
     root.wm_title('SSS2 plotting')
@@ -824,7 +842,7 @@ def test():
 
 def GUI(sss2_args=None,libfile=None):
     print('..TK init..')
-    root = tkinter.Tk()
+    root = tkinter.Tk(className="pysss2 geomPlotter")
     root.wm_title('SSS2 plotting')
     print('..GUI init..')
     G=geom_gui(root)
