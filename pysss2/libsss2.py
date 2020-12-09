@@ -10,6 +10,8 @@ import numpy as np
 _INFTY=1e37
 _COLOURS=256
 _MAX_STR=256
+_YES = 1
+_NO  = 0
 
 _str_encoding='utf-8'
 
@@ -22,7 +24,7 @@ It's main job is to convert b/w python & numpy types and c types.
 
     
     def __init__(self,serpent_arguments=None,libfile=None):
-        self.SUPPORTED_PYTHONPLOTTER_INTERFACE_VERSION = 11
+        self.SUPPORTED_PYTHONPLOTTER_INTERFACE_VERSION = 12
 
         
         
@@ -72,10 +74,133 @@ It's main job is to convert b/w python & numpy types and c types.
         self.sss2_getVersion.restype = ctypes.c_long
         self.sss2_getVersion.argtypes = [ctypes.POINTER(ctypes.c_char*_MAX_STR) , ctypes.POINTER(ctypes.c_long)]
 
+
+
+        ### plotImage ###
+        self.sss2_plotImage = self._sss2.PlotImage
+        self.sss2_plotImage.restype = ctypes.c_long
+        # The argtypes need to be updated per call because length varies
+        
+        ### PutPlotColors
+        self.sss2_putPlotColors = self._sss2.PutPlotColors
+        self.sss2_putPlotColors.argtypes=[ctypes.c_long,  #im
+                                          ctypes.POINTER(ctypes.c_long * _COLOURS), # *R 
+                                          ctypes.POINTER(ctypes.c_long * _COLOURS), # *G
+                                          ctypes.POINTER(ctypes.c_long * _COLOURS), # *B
+                                          ]
+        
+
         if not serpent_arguments is None:
             _ = self.start_run(serpent_arguments)
             
+
+    def getGenuineImage(self,
+                        xp:int, yp:int,
+                        xmin:float, xmax:float, ymin:float, ymax:float,
+                        position:float, plot_plane:int,
+                        boundaries : int=2, particle_type : int=2, 
+                        scale : int=0, E : float = 1.0 , fmin : float = 1.0, fmax : float=10.0, 
+                        quickplot : int= 0 ):
+        '''
+         Use the engine of the Serpent command line plotter to generate images.
+
+         Required parameters:
+         xp           : int    plot size in pixels
+         yp           : int    plot size in pixels
+         xmin         : float  first  plot axis minimum value (see plot_plane)
+         xmax         : float  first  plot axis maximum value (see plot_plane)
+         ymin         : float  second plot axis minimum value (see plot_plane)
+         ymax         : float  second plot axis maximum value (see plot_plane)
+         position     : float  The off-plane coordinate (e.g. z-coordinate for xy-plot)
+         plot_plane   : int    1 = yz, 2 = xz, 3 = xy
+
+         Optional parameters (default values:
+         boundaries   : int=2           plot boundaries? [0 = none, 1 = cell, 2 = material, 3 = both]
+         particle_type: int=0           neutron=2, gamma = 1 (defined in header.h)
+         scale        : int=0           0=no importance plot, 1,3=lin-scale, 2=log-scale
+         E            : float=1.0       Energy for importance plots (MeV)
+         fmin         : float=1.0       min value for importance plots
+         fmax         : float=10.0      max value for importance plots
+         quickplot    : int=0           0=quickplot-off, 1=quickplot-on
+        '''
         
+        npixels = xp * yp
+        
+        self.sss2_plotImage.argtypes = [ctypes.POINTER(ctypes.c_long*npixels), # The image
+                                        ctypes.c_long,ctypes.c_long,           # image size
+                                        ctypes.c_double, ctypes.c_double,      # xmin, xmax
+                                        ctypes.c_double, ctypes.c_double,      # ymin, ymax
+                                        ctypes.c_double, ctypes.c_double,      # zmin, zmax
+                                        ctypes.c_double,                       # position of the plane
+                                        ctypes.c_long,                         # plot boundaries
+                                        ctypes.c_long,                         # particle type (neutron=2, gamma = 1 (header.h))
+                                        ctypes.c_long,                         # plot plane (1 = yz, 2 = xz, 3 = xy).
+                                        ctypes.c_long,                         # scale (log/lin...)
+                                        ctypes.c_double,                       # energy (importance)
+                                        ctypes.c_double, ctypes.c_double,      # min max values (importance)
+                                        ctypes.c_long,                         # quickplot mode                                       
+                                        ]
+#long *mtx1, long xp, long yp, double xmin,
+#               double xmax, double ymin, double ymax, double zmin,
+#               double zmax, double pos, long bou, long par, long ax,
+#               long scale, double E, double fmin, double fmax, long qp
+               
+        
+        if plot_plane == 1:
+            minx = -_INFTY;   maxx =  _INFTY
+            miny = xmin;   maxy = xmax
+            minz = ymin;   maxz = ymax
+        elif plot_plane == 2:
+            minx = xmin;   maxx = xmax
+            miny = -_INFTY;   maxy =  _INFTY
+            minz = ymin;   maxz = ymax
+        elif plot_plane == 3:
+            minx = xmin;   maxx = xmax
+            miny = ymin;   maxy = ymax
+            minz = -_INFTY;   maxz =  _INFTY
+        else:
+            raise ValueError("plot_plane should be 1 = yz, 2 = xz or 3 = xy, but got {}.".format(plot_plane))
+        
+        image_c = (ctypes.c_long*npixels)()
+        for i in range(npixels):
+            image_c[i]=-2
+        status = self.sss2_plotImage(ctypes.pointer(image_c), xp, yp,
+                                     minx, maxx, miny, maxy, minz, maxz,
+                                     position,
+                                     boundaries,
+                                     particle_type,
+                                     plot_plane,
+                                     scale,E,fmin,fmax,
+                                     quickplot)
+        if status!= 0:
+            print('plotImage return status was {}, continuing.'.format(status))        
+
+        
+        image = -1*np.ones(shape=(xp*yp,),dtype=int)
+        image[:] = image_c
+        
+        #return image_c
+        
+        image = np.flipud( np.reshape(image,(xp,yp)).T )
+
+        #Shall we use importance plotting colorscale?
+        if scale > 0:
+            im = _YES
+        else:
+            im = _NO
+        R = (ctypes.c_long * _COLOURS )()
+        G = (ctypes.c_long * _COLOURS )()
+        B = (ctypes.c_long * _COLOURS )()
+        self.sss2_putPlotColors(im,ctypes.pointer(R),ctypes.pointer(G),ctypes.pointer(B))
+        
+        colormap = np.zeros(shape=(_COLOURS,3),dtype=int)
+        for i in range(len(R)):
+            colormap[i,0] = R[i]
+            colormap[i,1] = G[i]
+            colormap[i,2] = B[i]
+
+        return image,colormap
+
 
     def getGeometryParameters(self):
         """
