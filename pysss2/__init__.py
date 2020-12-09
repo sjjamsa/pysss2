@@ -10,5 +10,6 @@
 from . import geomPlotter
 from . import libsss2
 from . import slicer
+from . import plots
 
 version = "0.3.dev3"

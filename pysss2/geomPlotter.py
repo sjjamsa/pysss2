@@ -36,6 +36,7 @@ pySSS2 plotter by Simppa Äkäslompolo & Jaakko Leppänen
 
 class geom_gui(tkinter.Frame):
     
+    
     def __init__(self,root):
         super().__init__()
         self.root = root
@@ -502,23 +503,7 @@ class geom_gui(tkinter.Frame):
         self.root.update()
         self.updateGeomPlot()
 
-    def generate_colormap(self,rgb):
-        ''' rgb should be Nx3 numpy array'''
-
-        from matplotlib.colors import ListedColormap
-        
-        # We need an Nx4 numpy array
-        n = rgb.shape[0]
-        #print(rgb.shape)
-        oness=np.ones( (n,1) )
-        #print(oness.shape)
-           
-        arr = np.concatenate( (rgb.T,oness.T  ) ).T
-        
-
-        cm = ListedColormap(arr)  
-        return cm
-
+    
     def updateGeomPlot(self):
         self.varStatus.set("Updating from Serpent...")
         self.cursor_busy()
